@@ -1,0 +1,140 @@
+@if (event) {
+  <div class="min-h-screen bg-slate-950 text-white pb-32">
+    <div class="relative h-72">
+      <img [src]="event.image" [alt]="event.title" class="w-full h-full object-cover" />
+      <div
+        class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-950"
+      ></div>
+
+      <button
+        (click)="goBack()"
+        class="absolute top-6 left-4 w-10 h-10 bg-slate-950/80 backdrop-blur-sm rounded-full flex items-center justify-center border border-slate-700 hover:bg-slate-800 transition-colors"
+      >
+        <lucide-icon name="arrow-left" class="w-5 h-5"></lucide-icon>
+      </button>
+    </div>
+
+    <div class="px-4 -mt-12 relative z-10">
+      <div class="bg-slate-900 rounded-xl border border-slate-800 p-6 mb-4 shadow-xl">
+        <h1 class="text-2xl mb-4 font-bold">{{ event.title }}</h1>
+
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2 text-slate-400">
+            <lucide-icon name="map-pin" class="w-4 h-4 text-yellow-400"></lucide-icon>
+            <span class="text-sm">{{ event.location }}</span>
+          </div>
+          <div class="text-2xl text-yellow-400 font-bold">${{ event.price }}</div>
+        </div>
+
+        <div class="flex items-center gap-4 text-sm text-slate-400">
+          <div class="flex items-center gap-2">
+            <lucide-icon name="calendar" class="w-4 h-4"></lucide-icon>
+            <span>{{ event.date }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <lucide-icon name="clock" class="w-4 h-4"></lucide-icon>
+            <span>{{ event.time }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 rounded-xl border border-slate-800 p-6 mb-4">
+        <h2 class="text-lg mb-3 font-semibold">Sobre este evento</h2>
+        <p class="text-slate-400 text-sm leading-relaxed">{{ event.description }}</p>
+      </div>
+
+      <div class="bg-slate-900 rounded-xl border border-slate-800 p-6 mb-4">
+        <h2 class="text-lg mb-4 font-semibold">Especificaciones</h2>
+        <div class="grid grid-cols-3 gap-4">
+          <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700 text-center">
+            <lucide-icon name="eye" class="w-8 h-8 text-yellow-400 mx-auto mb-2"></lucide-icon>
+            <div class="text-xl text-yellow-400 font-bold">{{ event.visibility }}%</div>
+            <div class="text-[10px] uppercase text-slate-500">Visibilidad</div>
+          </div>
+
+          <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700 text-center">
+            <lucide-icon
+              name="telescope"
+              class="w-8 h-8 text-yellow-400 mx-auto mb-2"
+            ></lucide-icon>
+            <div class="text-[11px] text-yellow-400 mb-1 line-clamp-1 font-medium">
+              {{ event.equipment }}
+            </div>
+            <div class="text-[10px] uppercase text-slate-500">Equipo</div>
+          </div>
+
+          <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700 text-center">
+            <lucide-icon name="timer" class="w-8 h-8 text-yellow-400 mx-auto mb-2"></lucide-icon>
+            <div class="text-xl text-yellow-400 font-bold">
+              {{ event.duration ? event.duration.toString().split(' ')[0] : '3' }}h
+            </div>
+            <div class="text-[10px] uppercase text-slate-500">Duración</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 rounded-xl border border-slate-800 p-6 mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <lucide-icon name="users" class="w-5 h-5 text-yellow-400"></lucide-icon>
+            <span class="text-lg font-semibold">Disponibilidad</span>
+          </div>
+          <span class="text-yellow-400 font-medium">
+            {{ remainingSlots }} de {{ event.totalSlots }} plazas
+          </span>
+        </div>
+        <div class="bg-slate-800 rounded-full h-3 overflow-hidden mb-2">
+          <div
+            class="bg-gradient-to-r from-yellow-500 to-yellow-400 h-full"
+            [style.width.%]="occupancyPercent"
+          ></div>
+        </div>
+        <div class="flex justify-between text-xs text-slate-500">
+          <span>{{ occupancyPercent }}% reservado</span>
+          <span>{{ event.bookedSlots }} reservas confirmadas</span>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 rounded-xl border border-slate-800 p-6 mb-8 shadow-inner">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="text-white font-medium block">Número de asistentes</span>
+            <span class="text-xs text-slate-500">Máximo 10 por reserva</span>
+          </div>
+          <div
+            class="flex items-center gap-4 bg-slate-800 p-1.5 rounded-xl border border-slate-700"
+          >
+            <button
+              (click)="updateTickets(-1)"
+              class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-700"
+            >
+              -
+            </button>
+            <span class="font-bold text-yellow-400 text-lg w-4 text-center">{{ numTickets }}</span>
+            <button
+              (click)="updateTickets(1)"
+              class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-700"
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="bottom-16 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 p-4 z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.4)]"
+    >
+      <button
+        (click)="goBooking()"
+        class="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 text-slate-950 py-4 rounded-xl font-bold hover:brightness-110 active:scale-[0.98] transition-all"
+      >
+        Reservar {{ numTickets }} plazas • Total: ${{ event.price * numTickets }}
+      </button>
+    </div>
+  </div>
+} @else {
+  <div class="min-h-screen bg-slate-950 flex items-center justify-center">
+    <p class="text-slate-400 animate-pulse">Cargando detalles del evento...</p>
+  </div>
+}
