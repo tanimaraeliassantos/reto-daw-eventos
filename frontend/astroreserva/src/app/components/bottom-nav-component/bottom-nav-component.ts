@@ -2,7 +2,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 @Component({
   selector: 'app-bottom-nav',
@@ -11,37 +11,42 @@ import { Component } from '@angular/core';
   templateUrl: './bottom-nav-component.html',
 })
 export class BottomNavComponent {
-  constructor(
-    public auth: AuthService,
-    private router: Router,
-  ) {}
+  private auth = inject(AuthService);
+  private router = inject(Router);
 
   get navItems() {
+    const user = this.auth.currentUser();
     const items = [
       { icon: 'home', label: 'Inicio', path: '/' },
       { icon: 'calendar', label: 'Eventos', path: '/events' },
     ];
 
-    const user = this.auth.currentUser();
-    if (user?.role === 'ADMIN') {
-      items.push({ icon: 'settings', label: 'Admin', path: '/admin' });
+    if (user) {
+      // Si hay usuario, añadimos Dashboard y botón Logout
+      items.push({ label: 'Mis Citas', icon: 'calendar', path: '/user-dashboard' });
+      if (user.role === 'ADMIN') {
+        items.push({ label: 'Admin', icon: 'shield', path: '/admin' });
+      }
+      items.push({ label: 'Salir', icon: 'log-out', path: 'LOGOUT' });
+    } else {
+      // Si no hay usuario, botón de Login
+      items.push({ label: 'Entrar', icon: 'user', path: '/login' });
     }
-
-    items.push({ icon: 'user', label: 'Perfil', path: '/perfil' });
     return items;
   }
 
   handleNavClick(item: any) {
-    if (item.path === '/perfil') {
-      const user = this.auth.currentUser();
-      if (!user) {
-        this.router.navigate(['/login']);
-      } else {
-        this.router.navigate(['/dashboard']);
-      }
-    } else {
-      this.router.navigate([item.path]);
+    if (item.path === 'LOGOUT') {
+      this.handleLogout();
+      return;
     }
+
+    this.router.navigate([item.path]);
+  }
+
+  handleLogout() {
+    this.auth.logout();
+    this.router.navigate(['/login']);
   }
 
   isActive(path: string): boolean {

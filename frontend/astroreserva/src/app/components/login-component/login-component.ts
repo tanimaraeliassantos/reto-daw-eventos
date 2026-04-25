@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +12,11 @@ import { LucideAngularModule } from 'lucide-angular';
   templateUrl: './login-component.html',
 })
 export class LoginComponent {
-  isLogin = true; // Alternar entre Login y Registro
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  isLogin = true;
+
+  registerData = { name: '', email: '' };
 
   formData = {
     email: '',
@@ -19,22 +24,39 @@ export class LoginComponent {
     name: '',
   };
 
-  constructor(private router: Router) {}
-
   toggleMode() {
     this.isLogin = !this.isLogin;
   }
 
   onSubmit() {
-    // Simulación de autenticación
-    console.log('Datos enviados:', this.formData);
-
-    // Si es admin, podríamos redirigir al dashboard,
-    // pero por ahora vamos a la Home como usuario "logueado"
-    if (this.formData.email === 'admin@astroreserva.com') {
-      this.router.navigate(['/admin']); // Si es admin, va al panel
+  if (this.isLogin) {
+    // --- LÓGICA DE LOGIN ---
+    const success = this.authService.login(this.formData.email);
+    if (success) {
+      const user = this.authService.currentUser();
+      this.router.navigate([user.role === 'ADMIN' ? '/admin' : '/user-dashboard']);
     } else {
-      this.router.navigate(['/dashboard']); // Si es usuario, va a sus reservas
+      alert('Usuario no encontrado. Prueba con admin@astroreserva.com o regístrate.');
+    }
+  } else {
+    // --- LÓGICA DE REGISTRO ---
+    if (this.formData.name && this.formData.email) {
+      this.authService.register({ 
+        name: this.formData.name, 
+        email: this.formData.email 
+      });
+      this.router.navigate(['/user-dashboard']);
+    }
+  }
+}
+
+  onRegister() {
+    if (this.registerData.name && this.registerData.email) {
+      // Registramos y logueamos
+      this.authService.register(this.registerData);
+
+      // Redirigimos al Dashboard del usuario o a la Home
+      this.router.navigate(['/user-dashboard']);
     }
   }
 }
