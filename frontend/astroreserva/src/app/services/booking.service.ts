@@ -1,38 +1,72 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal, computed } from '@angular/core';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
-  private initialBookings = JSON.parse(localStorage.getItem('my_bookings') || '[]');
-  userBookings = signal<any[]>(this.initialBookings);
+  private auth = inject(AuthService);
 
-  constructor() {}
+  private _allBookings = signal<any[]>(JSON.parse(localStorage.getItem('my_bookings') || '[]'));
+
+  userBookings = computed(() => {
+    const user = this.auth.currentUser();
+    if (!user) return [];
+    return this._allBookings().filter((b) => b.userId === user.id);
+  });
 
   addBooking(booking: any) {
-    this.userBookings.update((all) => {
-      // 1. Buscamos si ya existe una reserva ACTIVA para este mismo evento
-      const exists = all.find((b) => b.eventTitle === booking.eventTitle && b.status === 'ACTIVO');
+    const user = this.auth.currentUser();
+    if (!user) return;
+
+    const newBooking = { ...booking, userId: user.id };
+
+    this._allBookings.update((all) => {
+      const exists = all.find(
+        (b) =>
+          b.eventTitle === newBooking.eventTitle && b.userId === user.id && b.status === 'ACTIVO',
+      );
 
       let updated;
       if (exists) {
-        // 2. Si existe, mapeamos el array y SUMAMOS los tickets
         updated = all.map((b) => {
           if (b.id === exists.id) {
             return {
               ...b,
-              // Sumamos la cantidad anterior + la nueva
-              tickets: b.tickets + booking.tickets,
-              // También actualizamos el total proporcionalmente
-              total: b.total + booking.total,
+              tickets: b.tickets + newBooking.tickets,
+              total: b.total + newBooking.total,
             };
           }
           return b;
         });
       } else {
-        // 3. Si no existe, lo añadimos como una entrada nueva al principio
-        updated = [booking, ...all];
+        updated = [newBooking, ...all];
       }
 
-      // 4. Persistencia en LocalStorage
+      localStorage.setItem('my_bookings', JSON.stringify(updated));
+      return updated;
+    });
+  }
+
+  // Método para cancelar
+  cancelBooking(id: string) {
+    this._allBookings.update((all) => {
+      const updated = all.map((b) => (b.id === id ? { ...b, status: 'CANCELADO' } : b));
+      localStorage.setItem('my_bookings', JSON.stringify(updated));
+      return updated;
+    });
+  }
+
+  updateBookingStatus(id: string, newStatus: string) {
+    this._allBookings.update((all) => {
+      const updated = all.map((b) => (b.id === id ? { ...b, status: newStatus } : b));
+      localStorage.setItem('my_bookings', JSON.stringify(updated));
+      return updated;
+    });
+  }
+
+  // Eliminar reserva permanentemente
+  deleteBooking(id: string) {
+    this._allBookings.update((all) => {
+      const updated = all.filter((b) => b.id !== id);
       localStorage.setItem('my_bookings', JSON.stringify(updated));
       return updated;
     });
