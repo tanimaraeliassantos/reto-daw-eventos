@@ -19,9 +19,7 @@ export class UserDashboardComponent {
   }
 
   get todasLasReservas() {
-    const reservas = this.bookingService.userBookings();
-    console.log('Reservas en el Service:', reservas); // Revisa la consola F12
-    return reservas;
+    return this.bookingService.userBookings();
   }
 
   get proximas() {
@@ -53,12 +51,10 @@ export class UserDashboardComponent {
   }
 
   cancelarReserva(id: string) {
-    if (confirm('¿Estás seguro de que deseas cancelar esta reserva?')) {
-      this.bookingService.userBookings.update((bookings) =>
-        bookings.map((b) => (b.id === id ? { ...b, status: 'CANCELADO' } : b)),
-      );
-    }
+  if (confirm('¿Estás seguro de que deseas cancelar esta reserva?')) {
+    this.bookingService.cancelBooking(id);
   }
+}
 
   generarPDF(reserva: any) {
     alert(`Descargando entrada para ${this.userName}...`);

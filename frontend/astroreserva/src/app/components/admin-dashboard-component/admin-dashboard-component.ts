@@ -166,16 +166,11 @@ export class AdminDashboardComponent implements OnInit {
 
   // CRUD de Reservas
   toggleStatus(res: any) {
-    this.bookingService.userBookings.update((bookings) =>
-      bookings.map((b) => {
-        if (b.id === res.id) {
-          const nextStatus =
-            b.status === 'Confirmed' || b.status === 'ACTIVO' ? 'CANCELADO' : 'Confirmed';
-          return { ...b, status: nextStatus };
-        }
-        return b;
-      }),
-    );
+    const nextStatus =
+      res.status === 'Confirmed' || res.status === 'ACTIVO' ? 'CANCELADO' : 'ACTIVO';
+
+    // Llamamos al nuevo método del servicio
+    this.bookingService.updateBookingStatus(res.id, nextStatus);
   }
 
   toggleCategory(catId: string) {
@@ -194,20 +189,18 @@ export class AdminDashboardComponent implements OnInit {
 
   deleteReservation(id: string) {
     if (confirm('¿Eliminar reserva permanentemente?')) {
-      this.bookingService.userBookings.update((bookings) => bookings.filter((b) => b.id !== id));
+      this.bookingService.deleteBooking(id);
     }
   }
 
   readonly users = this.authService.usersList;
 
-  // 2. Método para borrar
   deleteUser(id: string) {
     if (confirm('¿Eliminar este usuario permanentemente?')) {
       this.authService.deleteUser(id);
     }
   }
 
-  // 3. Método para cambiar rol (puedes llamarlo desde un botón en la tabla)
   toggleRole(user: any) {
     const newRole = user.role === 'ADMIN' ? 'CLIENTE' : 'ADMIN';
     this.authService.updateUserRole(user.id, newRole);

@@ -40,7 +40,7 @@
                 <span class="text-[10px] text-yellow-400 font-bold uppercase tracking-widest">{{
                   res.id
                 }}</span>
-                <h3 class="text-lg font-semibold">{{ res.eventTitle }}</h3>
+                <h3 class="text-lg font-semibold">{{ res.eventTitle || res.title }}</h3>
                 <p class="text-sm text-slate-400">{{ res.date }} • {{ res.tickets }} entradas</p>
               </div>
 
