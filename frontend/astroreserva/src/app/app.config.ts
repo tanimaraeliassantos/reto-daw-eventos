@@ -48,6 +48,8 @@ import {
   CreditCard,
   Edit3,
   UserPlus,
+  HelpCircle,
+  LogOut,
 } from 'lucide-angular';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './interceptors/auth.interceptor-interceptor';
@@ -97,7 +99,9 @@ export const appConfig: ApplicationConfig = {
         Ticket,
         CreditCard,
         Edit3,
-        UserPlus
+        UserPlus,
+        HelpCircle,
+        LogOut
       }),
     ),
     provideHttpClient(withInterceptors([authInterceptor])),

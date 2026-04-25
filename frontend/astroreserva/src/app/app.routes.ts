@@ -14,6 +14,7 @@ export const routes: Routes = [
   { path: 'booking/:id', component: BookingCheckoutComponent },
   { path: 'login', component: LoginComponent },
   { path: 'admin', component: AdminDashboardComponent },
+  { path: 'user-dashboard', component: UserDashboardComponent },
   { path: 'dashboard', component: UserDashboardComponent },
   { path: 'events', component: EventListComponent },
   {path: 'booking-success', component: BookingSuccessComponent},
