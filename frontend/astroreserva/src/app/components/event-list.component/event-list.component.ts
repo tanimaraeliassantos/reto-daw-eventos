@@ -31,17 +31,30 @@ export class EventListComponent implements OnInit {
   // Getter para transformar fechas de string a objeto Date una sola vez
   get allEvents() {
     return this.eventService.catalog().map((event) => ({
+      // Mantenemos los datos originales por si acaso
       ...event,
-      dateObj: new Date(event.date), // Usamos dateObj para no sobreescribir el string original
+      // TRADUCCIÓN: Nombre del Backend -> Nombre del HTML
+      title: event.nombre || event.title,
+      location: event.direccion || event.location,
+      date: event.fechaInicio || event.date,
+      price: event.precio || event.price,
+
+      // Objeto fecha para los filtros de calendario
+      dateObj: new Date(event.fechaInicio || event.date),
+
+      // Mapeo de categorías para que el filtro de iconos funcione
+      categories: event.tipo ? [event.tipo.nombre.toLowerCase()] : event.categories || [],
     }));
   }
 
   ngOnInit() {
+    // 2. Pedimos los datos al backend al arrancar
+    this.eventService.loadActivos();
+
     this.route.queryParams.subscribe((params) => {
       this.searchTerm = params['q'] || '';
       this.selectedCategory = params['category'] || '';
 
-      // Si hay búsqueda o categoría, mostramos la lista completa automáticamente
       if (this.selectedCategory || this.searchTerm) {
         this.showAllYear = true;
       }
