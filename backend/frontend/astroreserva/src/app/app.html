@@ -1,0 +1,5 @@
+<router-outlet></router-outlet>
+
+@if (!router.url.includes('admin') && !router.url.includes('login')) {
+  <app-bottom-nav></app-bottom-nav>
+}

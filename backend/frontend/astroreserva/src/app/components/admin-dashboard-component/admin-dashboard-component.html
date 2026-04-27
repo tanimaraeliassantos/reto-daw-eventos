@@ -1,0 +1,459 @@
+<div class="flex h-screen bg-slate-950 text-white overflow-hidden">
+  <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col flex-shrink-0">
+    <div class="p-6 border-b border-slate-800">
+      <h1 class="text-2xl font-bold tracking-tight">AstroReserva</h1>
+      <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest">Panel Admin</p>
+    </div>
+    <nav class="flex-1 p-4">
+      <div class="space-y-1">
+        @for (item of sidebarItems; track item.id) {
+          <button
+            (click)="setActiveTab(item.id)"
+            [class]="
+              'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ' +
+              (activeTab === item.id
+                ? 'bg-yellow-400/10 text-yellow-400'
+                : 'text-slate-400 hover:bg-slate-800 hover:text-white')
+            "
+          >
+            <lucide-icon [name]="item.icon" class="w-5 h-5"></lucide-icon>
+            <span class="font-medium">{{ item.label }}</span>
+          </button>
+        }
+      </div>
+    </nav>
+    <div class="p-4 border-t border-slate-800">
+      <button
+        (click)="goBack()"
+        class="w-full px-4 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm text-slate-400 hover:text-white transition-colors"
+      >
+        ← Volver a la App
+      </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <header class="bg-slate-900 border-b border-slate-800 px-8 py-5 flex-shrink-0">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-semibold mb-1">
+            {{
+              activeTab === 'dashboard'
+                ? 'Panel de Control'
+                : activeTab === 'events'
+                  ? 'Eventos'
+                  : 'Usuarios'
+            }}
+          </h2>
+          <p class="text-sm text-slate-400">Panel de control administrativo</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-8">
+      @if (activeTab === 'dashboard') {
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div
+            class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-yellow-400/30 transition-all"
+          >
+            <div class="flex items-start justify-between mb-4">
+              <div
+                class="bg-yellow-400/10 text-yellow-400 w-12 h-12 rounded-lg flex items-center justify-center"
+              >
+                <lucide-icon name="dollar-sign" class="w-6 h-6"></lucide-icon>
+              </div>
+            </div>
+            <div class="text-3xl font-bold mb-1">{{ totalSales }}</div>
+            <div class="text-sm text-slate-400">Ventas Totales</div>
+          </div>
+
+          <div
+            class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-yellow-400/30 transition-all"
+          >
+            <div class="flex items-start justify-between mb-4">
+              <div
+                class="bg-blue-400/10 text-blue-400 w-12 h-12 rounded-lg flex items-center justify-center"
+              >
+                <lucide-icon name="zap" class="w-6 h-6"></lucide-icon>
+              </div>
+            </div>
+            <div class="text-3xl font-bold mb-1">{{ reservations.length }}</div>
+            <div class="text-sm text-slate-400">Reservas Totales</div>
+          </div>
+
+          <div
+            class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-yellow-400/30 transition-all"
+          >
+            <div class="flex items-start justify-between mb-4">
+              <div
+                class="bg-green-400/10 text-green-400 w-12 h-12 rounded-lg flex items-center justify-center"
+              >
+                <lucide-icon name="calendar" class="w-6 h-6"></lucide-icon>
+              </div>
+            </div>
+            <div class="text-3xl font-bold mb-1">{{ activeEventsCount }}</div>
+            <div class="text-sm text-slate-400">Eventos Activos</div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl">
+          <div class="p-6 border-b border-slate-800">
+            <h3 class="text-xl font-semibold">Reservas del Sistema</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left">
+              <thead class="bg-slate-800/30 text-slate-400 text-xs uppercase tracking-wider">
+                <tr>
+                  <th class="px-6 py-4">ID</th>
+                  <th class="px-6 py-4">Evento</th>
+                  <th class="px-6 py-4">Entradas</th>
+                  <th class="px-6 py-4">Estado</th>
+                  <th class="px-6 py-4 text-center">Acción</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800">
+                @for (res of reservations; track res.id) {
+                  <tr class="hover:bg-slate-800/40 transition-colors">
+                    <td class="px-6 py-4 text-yellow-400 font-mono text-sm">{{ res.id }}</td>
+                    <td class="px-6 py-4 text-sm">{{ res.eventTitle }}</td>
+                    <td class="px-6 py-4 text-sm">{{ res.tickets }}</td>
+                    <td class="px-6 py-4">
+                      <span
+                        [ngClass]="
+                          res.status === 'Confirmed' || res.status === 'ACTIVO'
+                            ? 'bg-green-400/10 text-green-400'
+                            : 'bg-red-400/10 text-red-400'
+                        "
+                        class="px-2.5 py-1 rounded-full text-xs font-medium"
+                      >
+                        {{
+                          res.status === 'Confirmed' || res.status === 'ACTIVO'
+                            ? 'CONFIRMADO'
+                            : 'CANCELADO'
+                        }}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                      <button
+                        (click)="toggleStatus(res)"
+                        class="text-xs border border-slate-700 px-3 py-1 rounded hover:bg-slate-700 transition-colors"
+                      >
+                        Cambiar Estado
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      @if (activeTab === 'customers') {
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold">Gestión de Usuarios</h3>
+          <button
+            (click)="openEditUserModal(null)"
+            class="bg-yellow-400 text-slate-950 px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-yellow-300 transition-colors"
+          >
+            <lucide-icon name="user-plus" class="w-4 h-4"></lucide-icon> Nuevo Usuario
+          </button>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl">
+          <table class="w-full text-left">
+            <thead class="bg-slate-800/50 text-slate-400 text-xs uppercase font-bold">
+              <tr>
+                <th class="px-6 py-4">ID</th>
+                <th class="px-6 py-4">Nombre</th>
+                <th class="px-6 py-4">Email</th>
+                <th class="px-6 py-4">Rol</th>
+                <th class="px-6 py-4 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800">
+              @for (user of users(); track user.id) {
+                <tr class="hover:bg-white/5 transition-colors">
+                  <td class="px-6 py-4 text-slate-500 font-mono text-sm">{{ user.id }}</td>
+                  <td class="px-6 py-4 text-sm font-medium">{{ user.name }}</td>
+                  <td class="px-6 py-4 text-sm">{{ user.email }}</td>
+                  <td class="px-6 py-4">
+                    <span
+                      class="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-400/10 text-blue-400"
+                    >
+                      {{ user.role }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <div class="flex justify-end gap-2">
+                      <button
+                        (click)="openEditUserModal(user)"
+                        class="text-yellow-400 hover:bg-yellow-400/10 p-2 rounded-lg"
+                      >
+                        <lucide-icon name="edit-3" class="w-4 h-4"></lucide-icon>
+                      </button>
+                      <button
+                        (click)="deleteUser(user.id)"
+                        class="text-red-500 hover:bg-red-500/10 p-2 rounded-lg"
+                      >
+                        <lucide-icon name="trash" class="w-4 h-4"></lucide-icon>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      @if (activeTab === 'events') {
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold">Gestión de Catálogo</h3>
+          <button
+            (click)="openEditEventModal()"
+            class="bg-yellow-400 text-slate-950 px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-yellow-300 transition-colors"
+          >
+            <lucide-icon name="plus" class="w-4 h-4"></lucide-icon> Crear Taller
+          </button>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl">
+          <table class="w-full text-left">
+            <thead class="bg-slate-800/50 text-slate-400 text-xs uppercase font-bold">
+              <tr>
+                <th class="px-6 py-4">Evento</th>
+                <th class="px-6 py-4">Fecha</th>
+                <th class="px-6 py-4">Precio</th>
+                <th class="px-6 py-4 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800">
+              @for (item of catalog; track item.id) {
+                <tr class="hover:bg-white/5 transition-colors">
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      @if (item.image) {
+                        <img
+                          [src]="item.image"
+                          class="w-10 h-10 rounded-lg object-cover border border-slate-700"
+                        />
+                      }
+                      <div>
+                        <div class="font-medium">{{ item.title }}</div>
+                        <div class="text-xs text-slate-500">{{ item.location }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-sm">
+                    <div>{{ item.date }}</div>
+                    <div class="text-xs text-slate-500">
+                      {{ item.time || 'Horario no definido' }}
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-yellow-400 font-bold">${{ item.price }}</td>
+                  <td class="px-6 py-4 text-right">
+                    <div class="flex justify-end gap-2">
+                      <button
+                        (click)="openEditEventModal(item)"
+                        class="text-yellow-400 hover:bg-yellow-400/10 p-2 rounded-lg transition-colors"
+                      >
+                        <lucide-icon name="edit-3" class="w-4 h-4"></lucide-icon>
+                      </button>
+                      <button
+                        (click)="deleteEvent(item.id)"
+                        class="text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition-colors"
+                      >
+                        <lucide-icon name="trash" class="w-4 h-4"></lucide-icon>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </main>
+
+  @if (showEventForm) {
+    <div
+      class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-[100] flex items-center justify-center p-6"
+    >
+      <div
+        class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-[2.5rem] p-10 shadow-2xl overflow-y-auto max-h-[90vh]"
+      >
+        <h2 class="text-2xl font-bold mb-6 text-yellow-400">Configurar Nuevo Evento</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="md:col-span-2">
+            <label class="text-xs text-slate-500 ml-2 mb-1 block uppercase"
+              >Título del Evento</label
+            >
+            <input
+              [(ngModel)]="newEvent.title"
+              placeholder="Ej: Observación de Galaxias"
+              class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-yellow-400"
+            />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="text-xs text-slate-500 ml-2 mb-1 block uppercase">Ubicación</label>
+            <input
+              [(ngModel)]="newEvent.location"
+              placeholder="Ciudad o punto geográfico"
+              class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sm outline-none"
+            />
+          </div>
+
+          <div>
+            <label class="text-xs text-slate-500 ml-2 mb-1 block uppercase">Fecha</label>
+            <input
+              type="date"
+              [(ngModel)]="newEvent.date"
+              class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sm text-white"
+            />
+          </div>
+
+          <div>
+            <label class="text-xs text-slate-500 ml-2 mb-1 block uppercase">Precio ($)</label>
+            <input
+              type="number"
+              [(ngModel)]="newEvent.price"
+              placeholder="0.00"
+              class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sm"
+            />
+          </div>
+          <div class="md:col-span-2">
+            <label class="text-xs text-slate-500 ml-2 mb-2 block uppercase"
+              >Categorías del Evento</label
+            >
+            <div class="flex flex-wrap gap-2">
+              @for (cat of ['photo', 'telescope', 'stars', 'workshop']; track cat) {
+                <button
+                  (click)="toggleCategory(cat)"
+                  [class]="
+                    newEvent.categories?.includes(cat)
+                      ? 'bg-yellow-400 text-slate-950 border-yellow-400'
+                      : 'bg-slate-800 text-slate-400 border-slate-700'
+                  "
+                  class="px-4 py-2 rounded-xl border text-xs font-bold transition-all"
+                >
+                  {{ cat | uppercase }}
+                </button>
+              }
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 ml-2 mb-1 block uppercase">Capacidad Total</label>
+            <input
+              type="number"
+              [(ngModel)]="newEvent.totalSlots"
+              placeholder="Ej: 20"
+              class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sm focus:ring-2 focus:ring-yellow-400 outline-none"
+            />
+          </div>
+
+          <div>
+            <label class="text-xs text-slate-500 ml-2 mb-1 block uppercase">Horario</label>
+            <input
+              [(ngModel)]="newEvent.time"
+              placeholder="20:00 - 23:00"
+              class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sm"
+            />
+          </div>
+
+          <div>
+            <label class="text-xs text-slate-500 ml-2 mb-1 block uppercase">Duración</label>
+            <input
+              [(ngModel)]="newEvent.duration"
+              placeholder="3 horas"
+              class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sm"
+            />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="text-xs text-slate-500 ml-2 mb-1 block uppercase">URL de la Imagen</label>
+            <input
+              [(ngModel)]="newEvent.image"
+              placeholder="https://unsplash.com/..."
+              class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sm"
+            />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="text-xs text-slate-500 ml-2 mb-1 block uppercase"
+              >Descripción Completa</label
+            >
+            <textarea
+              [(ngModel)]="newEvent.description"
+              rows="3"
+              placeholder="Detalles de la experiencia..."
+              class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sm outline-none"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="flex gap-4 pt-6">
+          <button
+            (click)="closeModal()"
+            class="flex-1 text-slate-400 font-bold hover:text-white transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            (click)="saveEvent()"
+            class="flex-1 bg-yellow-400 text-slate-950 py-4 rounded-2xl font-bold hover:bg-yellow-300 shadow-lg shadow-yellow-400/20"
+          >
+            Guardar Evento
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showUserForm) {
+    <div
+      class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-[100] flex items-center justify-center p-6"
+    >
+      <div
+        class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl"
+      >
+        <h2 class="text-2xl font-bold mb-6">
+          {{ editingUser ? 'Editar Usuario' : 'Nuevo Usuario' }}
+        </h2>
+        <div class="space-y-4">
+          <input
+            [(ngModel)]="selectedUser.name"
+            placeholder="Nombre completo"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-yellow-400"
+          />
+          <input
+            [(ngModel)]="selectedUser.email"
+            placeholder="Email"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sm outline-none"
+          />
+          <select
+            [(ngModel)]="selectedUser.role"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sm outline-none"
+          >
+            <option value="CLIENTE">CLIENTE</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+          <div class="flex gap-4 pt-4">
+            <button (click)="closeUserModal()" class="flex-1 text-slate-400 font-bold">
+              Cancelar
+            </button>
+            <button
+              (click)="saveUser()"
+              class="flex-1 bg-yellow-400 text-slate-950 py-4 rounded-2xl font-bold"
+            >
+              {{ editingUser ? 'Actualizar' : 'Guardar' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

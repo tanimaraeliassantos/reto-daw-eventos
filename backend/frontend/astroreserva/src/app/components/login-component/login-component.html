@@ -1,0 +1,128 @@
+<div
+  class="min-h-screen bg-slate-950 flex items-center justify-center px-6 py-12 relative overflow-hidden"
+>
+  <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-yellow-400/10 rounded-full blur-[120px]"></div>
+  <div
+    class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[150px]"
+  ></div>
+
+  <div class="w-full max-w-md relative z-10">
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-light text-white tracking-tight">
+        Astro<span class="font-bold text-yellow-400">Reserva</span>
+      </h1>
+      <p class="text-slate-400 mt-2 text-sm uppercase tracking-widest">
+        {{ isLogin ? 'Bienvenido de nuevo' : 'Crea tu cuenta' }}
+      </p>
+    </div>
+
+    <div
+      class="bg-slate-900/50 backdrop-blur-xl border border-slate-800 p-8 rounded-[2rem] shadow-2xl"
+    >
+      <form (ngSubmit)="onSubmit()" #authForm="ngForm" class="space-y-5">
+        @if (!isLogin) {
+          <div class="space-y-2">
+            <label class="text-xs font-medium text-slate-400 ml-1 uppercase tracking-tighter"
+              >Nombre Completo</label
+            >
+            <div class="relative">
+              <lucide-icon
+                name="user"
+                class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"
+              ></lucide-icon>
+              <input
+                type="text"
+                name="name"
+                [(ngModel)]="formData.name"
+                required
+                class="w-full bg-slate-800/50 border border-slate-700 rounded-xl py-3 pl-11 pr-4 text-sm text-white focus:ring-2 focus:ring-yellow-400/50 outline-none transition-all"
+                placeholder="Elena García"
+              />
+            </div>
+          </div>
+        }
+
+        <div class="space-y-2">
+          <label class="text-xs font-medium text-slate-400 ml-1 uppercase tracking-tighter"
+            >Email</label
+          >
+          <div class="relative">
+            <lucide-icon
+              name="mail"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"
+            ></lucide-icon>
+            <input
+              type="email"
+              name="email"
+              [(ngModel)]="formData.email"
+              required
+              email
+              class="w-full bg-slate-800/50 border border-slate-700 rounded-xl py-3 pl-11 pr-4 text-sm text-white focus:ring-2 focus:ring-yellow-400/50 outline-none transition-all"
+              placeholder="tu@email.com"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex justify-between items-center px-1">
+            <label class="text-xs font-medium text-slate-400 uppercase tracking-tighter"
+              >Contraseña</label
+            >
+            @if (isLogin) {
+              <a
+                href="#"
+                class="text-[10px] text-yellow-400/70 hover:text-yellow-400 transition-colors"
+                >¿Olvidaste tu contraseña?</a
+              >
+            }
+          </div>
+          <div class="relative">
+            <lucide-icon
+              name="lock"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"
+            ></lucide-icon>
+            <input
+              type="password"
+              name="password"
+              [(ngModel)]="formData.password"
+              #pass="ngModel"
+              required
+              minlength="6"
+              class="w-full bg-slate-800/50 border border-slate-700 rounded-xl py-3 pl-11 pr-4 text-sm text-white focus:ring-2 focus:ring-yellow-400/50 outline-none transition-all"
+              placeholder="••••••••"
+            />
+          </div>
+
+          @if (pass.invalid && pass.touched) {
+            <p class="text-[10px] text-red-400 mt-1 ml-1 italic">Mínimo 6 caracteres requeridos</p>
+          }
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="!authForm.valid"
+          class="w-full bg-yellow-400 text-slate-950 font-bold py-4 rounded-xl shadow-lg shadow-yellow-400/10 hover:bg-yellow-300 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+        >
+          {{ isLogin ? 'Entrar' : 'Registrarme' }}
+        </button>
+      </form>
+
+      <div class="mt-8 pt-6 border-t border-slate-800 text-center">
+        <p class="text-sm text-slate-400">
+          {{ isLogin ? '¿No tienes cuenta?' : '¿Ya eres miembro?' }}
+          <button (click)="toggleMode()" class="text-yellow-400 font-medium hover:underline ml-1">
+            {{ isLogin ? 'Crea una ahora' : 'Inicia sesión' }}
+          </button>
+        </p>
+      </div>
+    </div>
+
+    <button
+      routerLink="/"
+      class="w-full mt-8 text-slate-500 text-xs flex items-center justify-center gap-2 hover:text-slate-300 transition-colors"
+    >
+      <lucide-icon name="arrow-left" class="w-3 h-3"></lucide-icon>
+      Volver a la exploración
+    </button>
+  </div>
+</div>

@@ -1,0 +1,118 @@
+@if (event) {
+<div class="min-h-screen bg-slate-950 text-white">
+  <div class="bg-slate-900 border-b border-slate-800 px-4 py-4 sticky top-0 z-10 backdrop-blur-md">
+    <div class="flex items-center gap-4">
+      <button
+        [routerLink]="['/event', id]"
+        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-800 transition-colors"
+      >
+        <lucide-icon name="arrow-left" class="w-5 h-5"></lucide-icon>
+      </button>
+      <h1 class="text-xl font-bold">Finalizar Reserva</h1>
+    </div>
+  </div>
+
+  <div class="px-4 py-6 pb-48"> <div class="bg-slate-900 rounded-xl border border-slate-800 p-5 mb-6">
+      <h2 class="text-sm uppercase tracking-widest text-slate-500 mb-4 font-bold">Resumen del evento</h2>
+      <h3 class="text-lg mb-4 text-yellow-400 font-semibold">{{ event.title }}</h3>
+      <div class="space-y-3 text-sm text-slate-400">
+        <div class="flex items-center gap-3">
+          <lucide-icon name="map-pin" class="w-4 h-4 text-yellow-400"></lucide-icon>
+          <span>{{ event.location }}</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <lucide-icon name="calendar" class="w-4 h-4 text-yellow-400"></lucide-icon>
+          <span>{{ event.date }}</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <lucide-icon name="clock" class="w-4 h-4 text-yellow-400"></lucide-icon>
+          <span>{{ event.time }}</span>
+        </div>
+      </div>
+      <div class="mt-5 pt-5 border-t border-slate-800 flex justify-between text-sm">
+        <span class="text-slate-400">Precio por entrada</span>
+        <span class="text-yellow-400 font-bold">${{ event.price }}</span>
+      </div>
+    </div>
+
+    <div class="bg-slate-900 rounded-xl border border-slate-800 p-5 mb-6">
+      <h2 class="text-lg mb-4 font-semibold">Número de entradas</h2>
+      <div class="flex items-center justify-between">
+        <span class="text-slate-400 text-sm">Máximo 10 por persona</span>
+        <div class="flex items-center gap-4 bg-slate-800 rounded-xl p-1.5 border border-slate-700">
+          <button
+            (click)="handleTicketChange(-1)"
+            [disabled]="tickets <= 1"
+            class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-700 disabled:opacity-30 transition-all"
+          >
+            <lucide-icon name="minus" class="w-5 h-5"></lucide-icon>
+          </button>
+          <span class="text-2xl w-8 text-center text-yellow-400 font-bold">{{ tickets }}</span>
+          <button
+            (click)="handleTicketChange(1)"
+            [disabled]="tickets >= 10"
+            class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-700 disabled:opacity-30 transition-all"
+          >
+            <lucide-icon name="plus" class="w-5 h-5"></lucide-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-slate-900 rounded-xl border border-slate-800 p-5 mb-6">
+      <h2 class="text-lg mb-4 font-semibold">Tus datos</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-500 uppercase mb-2 tracking-wider">Nombre completo *</label>
+          <input
+            type="text"
+            [(ngModel)]="formData.name"
+            placeholder="Ej. Juan Pérez"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-yellow-400 outline-none transition-all"
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-slate-500 uppercase mb-2 tracking-wider">Email *</label>
+          <input
+            type="email"
+            [(ngModel)]="formData.email"
+            placeholder="juan@ejemplo.com"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-yellow-400 outline-none transition-all"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+      <div class="space-y-3">
+        <div class="flex justify-between text-sm">
+          <span class="text-slate-400">Subtotal ({{ tickets }} × ${{ event.price }})</span>
+          <span>${{ subtotal }}</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-slate-400">Gastos de gestión (10%)</span>
+          <span>${{ serviceFee }}</span>
+        </div>
+        <div class="pt-4 border-t border-slate-800 flex justify-between items-center">
+          <span class="text-lg font-bold">Total</span>
+          <span class="text-3xl text-yellow-400 font-black">${{ total }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fixed bottom-16 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 p-4 z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
+    <button
+      (click)="handleSubmit()"
+      class="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 text-slate-950 py-4 rounded-xl font-bold shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-3 hover:brightness-110 active:scale-95 transition-all"
+    >
+      <lucide-icon name="credit-card" class="w-5 h-5"></lucide-icon>
+      <span class="uppercase tracking-widest text-sm">Confirmar y Pagar ${{ total }}</span>
+    </button>
+  </div>
+</div>
+} @else {
+  <div class="min-h-screen bg-slate-950 flex items-center justify-center">
+    <p class="text-slate-500 animate-pulse">Cargando reserva...</p>
+  </div>
+}

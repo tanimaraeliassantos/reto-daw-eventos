@@ -1,0 +1,28 @@
+<div
+  class="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 safe-area-inset-bottom z-50"
+>
+  <div class="max-w-lg mx-auto flex justify-around items-center h-16">
+    @for (item of navItems; track item.label) {
+      <button
+        (click)="handleNavClick(item)"
+        class="flex-1 flex flex-col items-center justify-center gap-1 transition-transform active:scale-90"
+      >
+        <lucide-icon
+          [name]="item.icon"
+          [class]="
+            'w-5 h-5 ' +
+            (isActive(item.path)
+              ? 'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]'
+              : 'text-slate-500')
+          "
+        ></lucide-icon>
+        <span
+          class="text-[9px] font-bold uppercase tracking-tighter"
+          [ngClass]="isActive(item.path) ? 'text-yellow-400' : 'text-slate-500'"
+        >
+          {{ item.label }}
+        </span>
+      </button>
+    }
+  </div>
+</div>
